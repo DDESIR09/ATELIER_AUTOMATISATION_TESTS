@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard — Tests Agify</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .subtitle { color: #8aa5c2; margin-bottom: 25px; }
+
+    .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      color: #0f2027;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 242, 254, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+    .section-title {
+      font-size: 1.4em;
+      margin: 40px 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.3), transparent);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-card.success { border-color: rgba(76, 175, 80, 0.5); }
+    .stat-card.danger { border-color: rgba(244, 67, 54, 0.5); }
+    .stat-card.warning { border-color: rgba(255, 193, 7, 0.5); }
+
+    .stat-number {
+      font-size: 2.2em;
+      font-weight: 700;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-card.success .stat-number {
+      background: linear-gradient(135deg, #4caf50, #8bc34a);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .stat-card.danger .stat-number {
+      background: linear-gradient(135deg, #f44336, #ff5722);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.85em;
+      color: #b0c4de;
+      margin-top: 8px;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 25px;
+      backdrop-filter: blur(10px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th {
+      font-weight: 600;
+      color: #8aa5c2;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:hover td { background: rgba(255, 255, 255, 0.03); }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+
+    .badge-pass {
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+      border: 1px solid rgba(76, 175, 80, 0.4);
+    }
+
+    .badge-fail {
+      background: rgba(244, 67, 54, 0.2);
+      color: #e57373;
+      border: 1px solid rgba(244, 67, 54, 0.4);
+    }
+
+    .details {
+      color: #ff9999;
+      font-size: 0.85em;
+      font-style: italic;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #8aa5c2;
+    }
+
+    .timestamp {
+      color: #8aa5c2;
+      font-size: 0.85em;
+      font-family: 'Courier New', monospace;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding-top: 25px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #8aa5c2;
+      font-size: 0.85em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <h1>📊 Dashboard — Tests Agify</h1>
+      <p class="subtitle">Monitoring automatisé de l'API Agify · Total runs : {{ total_runs }}</p>
+      <div class="actions">
+        <a href="/run" class="btn btn-primary">▶ Lancer un nouveau run</a>
+        <a href="/" class="btn btn-secondary">📋 Consignes</a>
+        <a href="/health" class="btn btn-secondary">💚 /health</a>
+        <a href="/api/runs" class="btn btn-secondary">📦 Export JSON</a>
+      </div>
+    </header>
+
+    {% if last_run %}
+
+      <h2 class="section-title">📈 Dernier run</h2>
+
+      <div class="stats-grid">
+        <div class="stat-card {% if last_run.summary.availability == 1 %}success{% else %}danger{% endif %}">
+          <div class="stat-number">{{ "✓" if last_run.summary.availability == 1 else "✗" }}</div>
+          <div class="stat-label">Disponibilité</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-number">{{ last_run.summary.passed }}</div>
+          <div class="stat-label">Tests réussis</div>
+        </div>
+        <div class="stat-card {% if last_run.summary.failed > 0 %}danger{% endif %}">
+          <div class="stat-number">{{ last_run.summary.failed }}</div>
+          <div class="stat-label">Tests échoués</div>
+        </div>
+        <div class="stat-card {% if last_run.summary.error_rate > 0.2 %}warning{% endif %}">
+          <div class="stat-number">{{ (last_run.summary.error_rate * 100) | round(1) }}%</div>
+          <div class="stat-label">Taux d'erreur</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ last_run.summary.latency_ms_avg }}</div>
+          <div class="stat-label">Latence moy. (ms)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ last_run.summary.latency_ms_p95 }}</div>
+          <div class="stat-label">Latence p95 (ms)</div>
+        </div>
+      </div>
+
+      <p class="timestamp">🕐 Exécuté le : {{ last_run.timestamp }}</p>
+
+      <h2 class="section-title">🧪 Détail des tests</h2>
+
+      <div class="panel">
+        <table>
+          <thead>
+            <tr>
+              <th>Test</th>
+              <th>Statut</th>
+              <th>Latence</th>
+              <th>Détails</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in last_run.tests %}
+              <tr>
+                <td>{{ t.name }}</td>
+                <td>
+                  {% if t.status == "PASS" %}
+                    <span class="badge badge-pass">✓ PASS</span>
+                  {% else %}
+                    <span class="badge badge-fail">✗ FAIL</span>
+                  {% endif %}
+                </td>
+                <td>{{ t.latency_ms }} ms</td>
+                <td class="details">{{ t.details or "—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="section-title">📜 Historique ({{ history | length }} derniers runs)</h2>
+
+      <div class="panel">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Timestamp</th>
+              <th>Passed</th>
+              <th>Failed</th>
+              <th>Taux d'erreur</th>
+              <th>Latence moy.</th>
+              <th>Latence p95</th>
+              <th>Disponibilité</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in history %}
+              <tr>
+                <td>#{{ r.id }}</td>
+                <td class="timestamp">{{ r.timestamp }}</td>
+                <td>{{ r.passed }}</td>
+                <td>{{ r.failed }}</td>
+                <td>{{ (r.error_rate * 100) | round(1) }}%</td>
+                <td>{{ r.latency_ms_avg }} ms</td>
+                <td>{{ r.latency_ms_p95 }} ms</td>
+                <td>
+                  {% if r.availability == 1 %}
+                    <span class="badge badge-pass">UP</span>
+                  {% else %}
+                    <span class="badge badge-fail">DOWN</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    {% else %}
+
+      <div class="panel empty">
+        <h2>Aucun run pour l'instant</h2>
+        <p style="margin-top: 12px;">Cliquez sur « Lancer un nouveau run » pour démarrer votre premier test.</p>
+      </div>
+
+    {% endif %}
+
+    <footer>
+      <p>🎓 Atelier Métriques 2026 — Monitoring de l'API <strong>Agify</strong></p>
+      <p style="margin-top: 6px;">Stack : Python · Flask · SQLite · PythonAnywhere</p>
+    </footer>
+
+  </div>
+</body>
+</html>
